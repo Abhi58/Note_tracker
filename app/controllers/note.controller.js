@@ -10,7 +10,7 @@ exports.create = (req, res) => {
     }
     
     //Create a Note
-    const note = new Note({
+    var note = new Note({
         title: req.body.title || "Untitled Note",
         content: req.body.content
     });
@@ -31,28 +31,51 @@ exports.findAll = (req, res) => {
 
 };
 
-// Find a single note with a noteId
-exports.findOne = (req, res) => {
-    Note.findById(req.params.noteId)
+// Find a single note by title
+exports.findOne = (req,res) => {
+    Note.findOne({title: req.params.title})
         .then(note => {
             if(!note) {
                 return res.status(404).send({
                     message: err.message || "Note not found"    
-                });  
+                }); 
             }
             res.send(note);
-        }).catch(err => {
-            if(err.kind === 'ObjectId'){
-                return res.status(404).send({
-                    message: err.message || "Note not found"
+        }).catch(
+            err => { 
+                if(err.kind === 'title'){
+                    return res.status(404).send({
+                        message: err.message || "Note not found"
+                    });
+                }
+                return res.status(500).send({
+                    message: err.message || "Could not retrieve Note"
                 });
-            }
-            return res.status(500).send({
-                message: err.message || "Could not retrieve Note"
             });
-         });
-
 };
+
+// Find a single note with a noteId
+// exports.findOne = (req, res) => {
+//     Note.findById(req.params.noteId)
+//         .then(note => {
+//             if(!note) {
+//                 return res.status(404).send({
+//                     message: err.message || "Note not found"    
+//                 });  
+//             }
+//             res.send(note);
+//         }).catch(err => {
+//             if(err.kind === 'ObjectId'){
+//                 return res.status(404).send({
+//                     message: err.message || "Note not found"
+//                 });
+//             }
+//             return res.status(500).send({
+//                 message: err.message || "Could not retrieve Note"
+//             });
+//          });
+
+// };
 
 // Update a note identified by the noteId in the request
 exports.update = (req, res) => {
